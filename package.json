@@ -8,3 +8,7 @@
     "coveralls": "^3.1.0"
   }
 }
+
+"scripts": {
+  "cover": "node\_modules/istanbul/lib/cli.js cover node\_modules/mocha/bin/\_mocha -- -R spec test/\*"
+}
