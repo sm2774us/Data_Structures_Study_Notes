@@ -8,13 +8,16 @@
   },
   "dependencies": {
     "coveralls": "^3.1.0",
-    "nyc": "^15.1.0"
+    "npm-which": "^3.0.1",
+    "nyc": "^15.1.0",
+    "which": "^2.0.2"
   },
   "devDependencies": {
-    "istanbul": "^0.4.5"
+    "istanbul": "^0.4.5",
+    "tape": "^5.0.1"
   },
   "scripts": {
-    "cover": "node_modules/istanbul/lib/cli.js cover node_modules/.bin/tape -- test/data-structures.test.js"
+    "cover": "./node_modules/istanbul/lib/cli.js cover ./node_modules/.bin/tape -- ./test/data-structures.test.js"
   },
   "repository": {
     "type": "git",
@@ -25,5 +28,6 @@
   "bugs": {
     "url": "https://github.com/sm2774us/Data_Structures/issues"
   },
-  "homepage": "https://github.com/sm2774us/Data_Structures#readme"
+  "homepage": "https://github.com/sm2774us/Data_Structures#readme",
+  "keywords": []
 }
