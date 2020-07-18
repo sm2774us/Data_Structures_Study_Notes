@@ -3,5 +3,8 @@
   "version": "1.0.0",
   "author": "Shaikat Majumdar <sm2774us@gmail.com>",
   "license": "CC-BY-4.0",
-  "main": "./data-structures.js"
+  "main": "./data-structures.js",
+  "devDependencies": {
+    "coveralls": "^3.1.0"
+  }
 }
