@@ -1,14 +1,26 @@
 {
-  "name": "data-structures",
+  "name": "data_structures",
   "version": "1.0.0",
+  "description": "Data Structure Notes",
+  "main": "data-structures.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "coveralls": "^3.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "cover": "node\_modules/istanbul/lib/cli.js cover node\_modules/mocha/bin/\_mocha -- -R spec test/\*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sm2774us/Data_Structures.git"
+  },
   "author": "Shaikat Majumdar <sm2774us@gmail.com>",
   "license": "CC-BY-4.0",
-  "main": "./data-structures.js",
-  "devDependencies": {
-    "coveralls": "^3.1.0"
-  }
-}
-
-"scripts": {
-  "cover": "node\_modules/istanbul/lib/cli.js cover node\_modules/mocha/bin/\_mocha -- -R spec test/\*"
+  "bugs": {
+    "url": "https://github.com/sm2774us/Data_Structures/issues"
+  },
+  "homepage": "https://github.com/sm2774us/Data_Structures#readme"
 }
