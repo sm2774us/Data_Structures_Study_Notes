@@ -17,7 +17,7 @@
     "tape": "^5.0.1"
   },
   "scripts": {
-    "cover": "./node_modules/istanbul/lib/cli.js cover ./node_modules/.bin/tape -- ./test/data-structures.test.js"
+    "cover": "./node_modules/istanbul/lib/cli.js cover ./node_modules/.bin/tape -- ./data-structures.test.js"
   },
   "repository": {
     "type": "git",
