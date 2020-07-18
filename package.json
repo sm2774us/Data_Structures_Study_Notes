@@ -5,3 +5,7 @@
   "license": "CC-BY-4.0",
   "main": "./data-structures.js"
 }
+
+"scripts": {
+  "cover": "node\_modules/istanbul/lib/cli.js cover node\_modules/mocha/bin/\_mocha -- -R spec test/\*"
+}
