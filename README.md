@@ -796,3 +796,889 @@ void radixSort(int * array, int length) {
     }
 }
 ```
+## Searching
+
+### Linear search
+
+| Linear search    | n = input size   |
+| ---------------- | ---------------- |
+| Time complexity  | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29) |
+| Space complexity | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29) |
+
+#### Algorithm idea
+
+Iterate every element in order and check if it is the element we are looking for.
+
+#### Code
+
+```c++
+int linearSearch(int *array, int length, int target) {
+    for (int i = 0; i < length; i++) {
+        if (array[i] == target) {
+            return i;
+        }
+    }
+    return -1;
+}
+```
+
+#### Uses
+
+Searching in unordered data, when we have very few queries. If we have many queries it’s better to sort the array and use faster searching for the queries.
+
+### Binary search
+
+| Binary search    | n = input size        |
+| ---------------- | --------------------- |
+| Time complexity  | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28log%28n%29%29) |
+| Space complexity | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)      |
+
+Works only on sorted array-like structures, which support $\mathcal{O}(1)$ access to elements.
+
+The algorithm uses $\mathcal{O}(log(n))$ space if written recursively, but can be written iteratively to have $\mathcal{O}(1)$ space as well.
+
+#### Algorithm idea
+
+1. Check the middle element, if it’s the element we are looking for - we are done
+2. If the element is bigger than the one we are looking for - recurse into the left sub-array (the sub-array with smaller elements).
+3. If the element is smaller than the one we are looking for - recurse into the right sub-array (the sub-array with bigger elements).
+
+#### Code
+
+```c++
+int binarySearch(int *array, int length, int target) {
+    int left = 0;
+    int right = length - 1;
+
+    while(left <= right) {
+        int mid = (left + right) / 2;
+
+        if (array[mid] == target) {
+            return mid;
+        }
+        if (array[mid] > target) {
+            right = mid - 1;
+        }
+        if (array[mid] < target) {
+            left = mid + 1;
+        }
+    }
+
+    return -1;
+}
+```
+
+#### Uses
+
+Fast searching in ordered data.
+
+Guess and check algorithms.
+
+### Ternary search
+
+| Ternary search   | n = input size        |
+| ---------------- | --------------------- |
+| Time complexity  | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28log%28n%29%29) |
+| Space complexity | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)      |
+
+#### Algorithm idea
+
+The same idea as binary search but we split the array in 3 parts. On each step we decide which one part to discard and recurse into the other 2.
+
+#### Code
+
+```c++
+int ternarySearch(int *array, int length, int target) {
+    int left = 0;
+    int right = length - 1;
+
+    while (left <= right) {
+        int leftThird = left + (right - left) / 3;
+        int rightThird = right - (right - left) / 3;
+
+        if (array[leftThird] == target) {
+            return leftThird;
+        }
+        if (array[rightThird] == target) {
+            return rightThird;
+        }
+
+        if (target < array[leftThird]) {
+            right = leftThird - 1;
+        } else if (target > array[rightThird]) {
+            left = rightThird + 1;
+        } else  {
+            left = leftThird + 1;
+            right = rightThird - 1;
+        }
+    }
+
+    return -1;
+}
+```
+
+#### Uses
+
+Finding min/max in a sorted array.
+
+### Exponential search
+
+| Exponential search | n = input size        |
+| ------------------ | --------------------- |
+| Time complexity    | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28log%28n%29%29) |
+| Space complexity   | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)      |
+
+#### Algorithm idea
+
+This is the binary search algorithm applied for ordered data of unknown size. We don’t have a mid point so we start from the beginning and double our guessed index each time. e.g for guessed index: 1, 2, 4, 8, 16, 32... If we overshoot the end of the data we go back using binary search because we now have an end index. e.g for array with 27 elements we do a jump to element 32 which doesn’t exist and then use binary search on elements 16 - 32.
+
+#### Code
+
+```c++
+int exponentialSearch(int *array, int length, int target) {
+   if (length == 0) {
+      return false;
+   }
+
+   int right = 1;
+   while (right < length && array[right] < target) {
+      right *= 2;
+   }
+
+   int binaryIndex = binarySearch(array + right/2, min(right + 1, length) - right/2, target);
+   if (binaryIndex != -1) {
+      return binaryIndex + right/2;
+   } else {
+      return -1;
+   }
+}
+```
+
+#### Uses
+
+Binary search on streams, which are ordered and other ordered data of unknown size. 
+
+### Jump search
+
+| Jump search      | n = input size        |
+| ---------------- | --------------------- |
+| Time complexity  | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28log%28n%29%29) |
+| Space complexity | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)      |
+
+#### Algorithm idea
+
+We decide on a jump step and check elements on each step. e.g for step 32 we will check elements 0, 32, 64, etc.
+
+Optimal jump step is $\sqrt{n}$.
+
+#### Code
+
+```c++
+int jumpSearch(int *array, int length, int target) {
+   int left = 0;
+   int step = sqrt(length);
+   int right = step;
+
+   while(right < length && array[right] <= target) {
+      left += step;
+      right += step;
+      if(right > length - 1)
+         right = length;
+   }
+
+   for(int i = left; i < right; i++) {
+      if(array[i] == target)
+         return i;
+   }
+
+   return -1;
+}
+```
+
+#### Uses
+
+Because it’s worse than Binary search, it’s useful when the data structure we are searching in has very slow jump back, aka it’s slow to go back to index $i - 10$ from $i$.
+
+### Interpolation search
+
+| Interpolation search                        | n = input size             |
+| ------------------------------------------- | -------------------------- |
+| Time complexity for evenly distributed data | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28log%28log%28n%29%29%29) |
+| Time complexity for badly distributed data  | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29)           |
+| Space complexity                            | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)           |
+
+#### Algorithm idea
+
+If we have well distributed data we can approximate where we will find the element with the following formula
+![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20jumpToIndex%3DstartIndex&plus;%28%5Cfrac%7BendIndex-startIndex%7D%7Barray%5BendIndex%5D-array%5BstartIndex%5D%7D%29%5Ctimes%20%28target-array%5BstartIndex%5D%29)
+Example for well distributed data: 1, 2, 3, 4, 5, 6 .... 99, 100
+
+Example for badly distributed data: 1, 1, 1, 1.... 1, 1, 100
+
+#### Code
+
+```c++
+int interpolationSearch(int *array, int length, int target) {
+    int left = 0;
+    int right = length - 1;
+
+    while (array[right] != array[left] && target >= array[left] && target <= array[right]) {
+        int mid = left + ((target - array[left]) * (right - left) / (array[right] - array[left]));
+
+        if (array[mid] < target)
+            left = mid + 1;
+        else if (target < array[mid])
+            right = mid - 1;
+        else
+            return mid;
+    }
+
+    if (target == array[left])
+        return left;
+    else
+        return -1;
+}
+```
+
+#### Uses
+
+Very situational, when we have data which is evenly distributed.
+
+## Linked lists
+
+![](https://i.imgur.com/u8jPKdM.png)
+
+Linked list stores its data in separate Nodes. Each node points the next node in the list. The last node points NULL.
+
+The most primitive linked list’s node contains 2 fields - Data and Next pointer
+
+```c++
+struct Node {
+	int data;
+	Node* next;
+};
+```
+
+#### Complexity comparison
+
+| Operation / Data structure | Array            | Singly linked list without tail | Singly linked list with tail | Doubly linked list without tail | Doubly linked list with tail |
+| -------------------------- | ---------------- | ------------------------------- | ---------------------------- | ------------------------------- | ---------------------------- |
+| push_front                 | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29) | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)                | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)             | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)                | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)             |
+| pop_front                  | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29) | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)                | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)             | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)                | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)             |
+| get_front                  | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29) | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)                | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)             | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)                | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)             |
+| push_back                  | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29) | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29)                | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)             | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29)                | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)             |
+| pop_back                   | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29) | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29)                | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29)             | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29)                | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)             |
+| get_back                   | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29) | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29)                | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)             | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29)                | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)             |
+| get_at                     | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29) | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29)                | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29)             | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29)                | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29)             |
+| find_key                   | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29) | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29)                | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29)             | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29)                | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29)             |
+| erase_key                  | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29) | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29)                | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29)             | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29)                | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29)             |
+| is_empty                   | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29) | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)                | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)             | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)                | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)             |
+| add_before                 | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29) | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29)                | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29)             | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)                | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)             |
+| add_after                  | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29) | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)                | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)             | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)                | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)             |
+
+#### Memory allocation
+
+##### Array
+
+![](https://i.imgur.com/YrXJ0RG.png)
+
+##### Linked list
+
+![](https://i.imgur.com/s6NIOOy.png)
+
+#### Use
+
+Linked lists are useful if we don’t know the input size (when getting data from streams).
+
+Also if we want constant time for adding/removing element from the front/back and not amortized constant.
+
+#### Inserting a node
+
+![](https://i.imgur.com/myKqfvr.png)
+
+#### Removing a node
+
+![](https://i.imgur.com/TwspHEo.png)
+
+### Singly linked list
+
+Singly linked lists have only one pointer to the next Node.
+
+```C++
+struct Node {
+	int data;
+	Node* next;
+};
+```
+
+### Doubly linked list
+
+Doubly linked lists have two pointers, one to the previous item, one to the next.
+
+```c++
+struct Node {
+	int data;
+	Node* previous;
+	Node* next;
+};
+```
+
+### Circular linked list
+
+Circular linked lists can be implemented as singly or doubly linked list but the start and end nodes are connected. i.e the end node’s next pointer is not NULL but points the first node instead.
+
+### XOR linked list
+
+Doubly linked list using memory for singly linked list. The idea is to XOR the address of the previous element and the next element and save that XOR value in one pointer. When we need to access the next element, we XOR the pointer we have saved with the address of the previous element and the result will be the pointer to the next element.
+
+### Unrolled linked list
+
+Linked list of arrays. Usually the size of the array is the size of the CPU cache. This way we can quickly iterate through the arrays in the cache and we also have the benefits of a linked list.
+
+### Skip list
+
+A skip list is a linked list-like data structure which allows ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28logn%29) search and ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28logn%29) insertion in an ordered sequence of elements. It builds ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28logn%29) lanes up with links more and more sparse. The chance to build the next lane of links up is 1/2. The higher lanes are “express lanes” for the lanes bellow. The idea is to quickly get to the approximate location we need to get to on the higher lanes and then go down on the lower lanes to the exact location we need.
+
+![](https://i.imgur.com/XW8f8Y0.png)
+
+## Dynamic arrays
+
+A dynamic array is an array which grows in size when it’s full. Each time it increases its size 2 times. e.g the size at the start is 1, then 2, 4, 8, 16....
+
+The good points are we have amortized ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29) Add and ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29) access like in regular arrays.
+
+The downsides are If we have added 32 items and have reserverd 64 items, but don’t add any more items  we are wasting memory needlessly. Also, when adding, if the array is full we will need to resize so occasionally our Add will be with ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29) complexity.
+
+### Amortized complexity
+
+Amortized complexity is the total expense per operation, evaluated over a sequence of operations.
+
+In other words if we add 1 item it could be very expensive ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29) but if we add `n` items it is going be ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29) to add all n-items.
+
+Explained with example:
+
+Let’s take a dynamic array (in C++ that would be std::vector).
+
+At the start we have 1 empty slot. In constant time we add 1 item at the end.
+
+When we want to add 1 more item, our array is full, so we expand it 2x in size to 2 items, we copy the old 1 item at the start and in constant time we add the new item at the end. The copy operation takes ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29) steps.
+
+We want to add a 3rd item, but we have capacity of 2, we expand the array to 4 in ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29) steps and add the new item to the end in constant time.
+
+We want to add a 4th item, and we have capacity of 4 so we can add it to the end in constant time.
+
+In conclusion, every time we want to add an item in position ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%202%5Ek) we have to expand with complexity . All other additions are with ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29) comlexity.
+
+So in the end we have ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%201%20&plus;%202%5E0%20&plus;%201%20&plus;%202%5E1%20&plus;%201%20&plus;%201%20&plus;%202%5E2%20&plus;%201%20&plus;%201%20&plus;...%20&plus;%202%5Ek) where ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20k%20%3D%20log%28n%29). If we sum these numbers we will get n from the 1s and 2n from the powers of 2. In conclusion adding n items costs us ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29) time. In other words amortized ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29) per item.
+
+## Stack (LIFO)
+
+A stack is a **restricted** data structure - allows access only to the element at the top of the stack.
+
+Add elements to the top, take from the top.
+
+LIFO = Last In First Out
+
+### Problems that can occur with stacks
+
+Overflow - Adding too many elements and the stack cannot contain them
+
+Underflow - Try to access the top element when the stack is empty
+
+| Stack with   | Dynamic Array                      | Linked list      |
+| ------------ | ---------------------------------- | ---------------- |
+| push()       | Amortized ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)         | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29) |
+| pop()        | Amortized ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)         | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29) |
+| peek()/top() | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)                   | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29) |
+| clear()      | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28p%29) - delete memory   | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29) |
+| isEmpty()    | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)                   | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29) |
+| initialize   | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28p%29) - allocate memory | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29) |
+| merge        | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29)                   | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29) |
+
+### Application of stacks
+
+1. Undo/Redo in programs
+2. Reverse word/array
+3. Programming languages are usually compiled down and work as a pushdown automaton
+4. Syntax parsing - used by compilers
+5. Switching between infix and prefix notation
+6. Backtracking
+
+## Queue (FIFO)
+
+Add elements to the back, take from the front.
+
+FIFO = First In First Out
+
+| Stack with       | Dynamic Array                      | Linked list      |
+| ---------------- | ---------------------------------- | ---------------- |
+| push()/enqueue() | Amortized ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)         | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29) |
+| pop()/dequeue()  | Amortized ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)         | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29) |
+| peek()/top()     | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)                   | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29) |
+| clear()          | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28p%29) - delete memory   | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29) |
+| isEmpty()        | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29)                   | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29) |
+| initialize       | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28p%29) - allocate memory | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%281%29) |
+
+### Application of queues
+
+1. System processes
+2. Interactive processes
+3. Background processes
+4. Batch process
+5. CPU scheduling
+6. Synchronize data transfer
+7. Print spooler
+8. First-come-first-serve (servers for example)
+
+![](https://www.tutorialspoint.com/operating_system/images/queuing_diagram.jpg)
+
+### Ring buffer
+
+Ring buffers are queues where the new data can overwrite the old data when needed. It’s like a queue implemented with an array, providing limited space. Problem that can occur if the pointer for adding new data reaches the pointer for fetching data, in other words the front pointer and the back pointer must never overlap.
+
+![](https://i.imgur.com/kVoguMh.png)
+
+#### Application of ring buffers
+
+1. Chats
+2. Real-time processing
+
+### Okasaki Queue
+
+A queue implemented with 2 linked lists.
+
+https://ucsd-progsys.github.io/liquidhaskell-tutorial/09-case-study-lazy-queues.html
+
+Other interesting topic to research https://en.wikipedia.org/wiki/Persistent_data_structure
+
+## Trees
+
+A tree is a hierarchical data structure. A tree has one root node (one starting element) and all other elements are children/grandchildren/etc. of this root element.
+
+![](https://i.imgur.com/5ownlqQ.jpg)
+
+The root in the picture above is 2. Its children are 7 and 5. 5 is a child of the root 2 and also the parent of 9.
+
+### How does the tree stay connected
+
+There are 2 ways to keep the Nodes in the tree connected.
+
+1. Each parent has pointers to its children. (The classic widely used approach)
+2. Each node has a pointer to its parent. (Not widely used in most algorithms, but still very useful in some particular problems)
+3. 1 and 2 combined - Each node has pointers to its children and a pointer to its parent. This makes the traversal of the tree very easy in each direction, but also takes more memory.
+
+### Node of a binary tree
+
+```c++
+struct Node {
+    int data;
+    Node* left = nullptr;
+    Node* right = nullptr;
+};
+```
+
+### Node of a tree with variable number of children
+
+```c++
+struct Node {
+    int data;
+    vector<Node*> children;
+};
+```
+
+### Traversals
+
+#### Preorder (DFS)
+
+Preorder traversal is also known as DFS (Depth First Search).
+
+Time complexity ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29), where `n` is the number of nodes in the tree.
+
+The order in which we visit nodes is
+
+1. Current node
+2. Children of the node in order from left to right
+
+```c++
+void DFS(Node* current) {
+    if (current == nullptr) {
+        return;
+    }
+    
+    cout << current->data; // do something with the node
+    
+    DFS(current->left);
+    DFS(current->right);
+}
+```
+
+#### Postorder
+
+Time complexity ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29), where `n` is the number of nodes in the tree.
+
+The order in which we visit nodes is
+
+1. Children of the node in order from left to right
+2. Current node
+
+```c++
+void Postorder(Node* current) {
+    if (current == nullptr) {
+        return;
+    }
+
+    Postorder(current->left);
+    Postorder(current->right);
+    
+    cout << current->data; // do something with the node
+}
+```
+
+#### Inorder traversal
+
+Time complexity ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29), where `n` is the number of nodes in the tree.
+
+The order in which we visit nodes is
+
+1. Left child
+2. Current node
+3. Right child
+
+```c++
+void Postorder(Node* current) {
+    if (current == nullptr) {
+        return;
+    }
+
+    Postorder(current->left);
+    cout << current->data; // do something with the node
+    Postorder(current->right);
+}
+```
+
+#### Level order
+
+Level order is also known as WFS (Width First Search) or BFS (Breadth First Search).
+
+Time complexity ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29), where `n` is the number of nodes in the tree.
+
+The order in which we visit nodes is
+
+1. All the nodes of level 1 (the root)
+2. All the nodes of level 2 from left to right (the children of the root)
+3. All the nodes of level 3 from left to right
+4. etc.
+
+#### Morris order
+
+Morris order is an inorder traversal algorithm which does not use extra space for recursion or a stack. However it changes the tree during traversal and then reverts it to its original state.
+
+https://en.wikipedia.org/wiki/Tree_traversal#Morris_in-order_traversal_using_threading
+
+### Tree variations
+
+#### Generalized tree
+
+A tree where each node stores whatever data we need and has an arbitrary number of children.
+
+```c++
+struct Node {
+	int data;
+    std::vector<Node*> children;
+}
+```
+
+#### Trie
+
+#### Segment Tree
+
+#### Merge Tree
+
+#### K-D Tree
+
+#### BSP Tree
+
+#### Merkle Tree
+
+#### Treap
+
+#### Threaded Binary Tree
+
+#### Strict Binary Tree
+
+#### Full Binary Tree
+
+#### Complete Binary Tree
+
+## Binary Search Trees
+
+### BST
+
+A binary search tree is a tree with the following properties
+
+1. Each node has at most 2 children (left and right)
+2. The value of the left child of a node is smaller than the value of the parent
+3. The value of the right child of a node is bigger than the value of the parent
+
+```c++
+struct BST {
+    int data;
+    BST* left;
+    BST* right;
+}
+```
+
+
+| BST operation | Average case        | Worst case       |
+| ------------- | ------------------- | ---------------- |
+| insert(key)   | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28logn%29) | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29) |
+| remove(key)   | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28logn%29) | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29) |
+| find(key)     | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28logn%29) | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29) |
+| findMin()     | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28logn%29) | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29) |
+| findMax()     | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28logn%29) | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29) |
+
+The order in which we receive the data is important! If we receive ordered array [1, 2, 3, 4, ...] we will constantly add in the right subtree. Therefore we will hit the worst case ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28n%29) per operation.
+
+### AVL Tree
+
+AVL Tree is a BST tree which also has information on each node what is the height of the node. This allows it to balance itself and always keep the height as small as possible.
+
+```c++
+struct BST {
+    int data;
+    int height;
+    BST* left;
+    BST* right;
+}
+```
+
+#### Complexity
+
+| BST operation | Average case        | Worst case          |
+| ------------- | ------------------- | ------------------- |
+| insert(key)   | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28logn%29) | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28logn%29) |
+| remove(key)   | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28logn%29) | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28logn%29) |
+| find(key)     | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28logn%29) | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28logn%29) |
+| findMin()     | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28logn%29) | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28logn%29) |
+| findMax()     | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28logn%29) | ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%5Cmathcal%7BO%7D%28logn%29) |
+
+The order in which we receive the data doesn’t matter because the tree balances itself to always have the smallest possible height.
+
+#### Balancing
+
+Balancing is done using the height kept in the nodes. To use the height a Balance Factor (BF) is calculated on each node. ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20BF%20%3D%20height%28leftSubTree%29%20-%20height%28rightSubTree%29). Depending on the value of the balance factor there are the following 2 situations:
+
+1. ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%7CBF%7C%20%5Cleq%201) - If the balance factor is between -1 and 1 then the node is balanced.
+2. ![equation](https://latex.codecogs.com/svg.latex?%5Cbg_white%20%7CBF%7C%20%3E%201) - if the balance factor less than -1 or more than 1 (e.g -2 or 2), the node is not balanced and we must balance it.
+
+If a node is unbalanced we can have 4 rotations that we can do:
+
+1. RR (Right Right) - For the current node the **right** subtree is heavier. For the **right child** of the current node the **right** subtree is heavier.
+2. RL (Right Left) - For the current node the **right** subtree is heavier. For the **right child** of the current node the **left** subtree is heavier.
+3. LL (Left Left) - For the current node the **left** subtree is heavier. For the **left child** of the current node the **left** subtree is heavier.
+4. LR (Left Right) - For the current node the **left** subtree is heavier. For the **left child** of the current node the **right** subtree is heavier.
+
+#### Code
+
+##### Height and balance calculation
+
+```c++
+void calculateHeight() {
+    height = 0;
+    if (left) {
+        height = max(height, left->height + 1);
+    }
+    if (right) {
+        height = max(height, right->height + 1);
+    }
+}
+
+int leftHeight() const {
+    if (left) {
+        return left->height + 1;
+    }
+    return 0;
+}
+
+int rightHeight() const {
+    if (right) {
+        return right->height + 1;
+    }
+    return 0;
+}
+
+void recalculateHeights() {
+    if (left) {
+        left->calculateHeight();
+    }
+    if (right) {
+        right->calculateHeight();
+    }
+    this->calculateHeight();
+}
+
+int balance() const {
+    return leftHeight() - rightHeight();
+}
+```
+
+##### Rotations
+
+```c++
+void rotateRight() {
+    if (!left) {
+        return;
+    }
+
+    Node* leftRight = this->left->right;
+    Node* oldRight = this->right;
+
+    swap(this->data, this->left->data);
+    this->right = this->left;
+    this->left = this->left->left;
+    this->right->left = leftRight;
+    this->right->right = oldRight;
+}
+
+void rotateLeft() {
+    if (!right) {
+        return;
+    }
+
+    Node* rightLeft = this->right->left;
+    Node* oldLeft = this->left;
+
+    swap(this->data, this->right->data);
+    this->left = this->right;
+    this->right = this->right->right;
+    this->left->left = oldLeft;
+    this->left->right = rightLeft;
+}
+```
+
+##### Check at each node when going up/down the recursion when inserting/deleting/etc.
+
+```c++
+void fixTree() {
+    if (balance() < -1) { // Right is heavier
+        if (right->balance() <= -1) { // RR
+            this->rotateLeft();
+            recalculateHeights();
+        }
+        else if (right->balance() >= 1) { // RL
+            right->rotateRight();
+            this->rotateLeft();
+            recalculateHeights();
+        }
+    }
+    else if (balance() > 1) { // Left is heavier
+        if (left->balance() >= 1) { // LL
+            this->rotateRight();
+            recalculateHeights();
+        }
+        else if (left->balance() <= -1) { // LR
+            left->rotateLeft();
+            this->rotateRight();
+            recalculateHeights();
+        }
+    }
+}}
+```
+
+##### Modify insert
+
+```c++
+Node* _insert(int value, Node* current) {
+	// insert from BST
+    current->calculateHeight();
+    current->fixTree();
+    return current;
+}
+```
+
+##### Modify remove
+
+```c++
+Node* _remove(int value, Node* current) {
+	// remove from BST
+    current->calculateHeight();
+    current->fixTree();
+    return current;
+}
+```
+
+### Splay Tree
+
+### Scape Goat Tree
+
+### Red-black Tree
+
+### 2-3 Tree
+
+## Heap
+
+
+
+### Heap sort
+
+## Disjoint Set
+
+## Hashes
+
+### Rolling hash
+
+### Bloom Filter
+
+## Graphs
+
+### Graph variations
+
+#### Undirected Graph
+
+#### Directed Graph
+
+#### Weighted Graph
+
+#### Connected Graph
+
+#### Disconnected Graph
+
+#### Trees
+
+#### Complete Graph
+
+#### Tournament Graph
+
+#### Bipartite Graph
+
+### Representing Graphs
+
+#### Edge List
+
+#### Adjacency Matrix
+
+#### Adjacency List
+
+### Exploring Graphs
+
+#### Depth First Search
+
+#### Breadth First Search
+
+#### Topological Sorting
+
+### Minimum Spanning Tree
+
+#### Prim
+
+#### Kruskal
+
+### Shortest Path
+
+#### Dijkstra
+
+#### Bellman-Ford
+
+#### A*
+
+## NP-problems
