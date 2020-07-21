@@ -1,5 +1,9 @@
 # Data structures and Algorithms
 
+[![Build Status](https://travis-ci.com/sm2774us/Coding_Practice.svg?branch=master)](https://travis-ci.com/sm2774us/Data_Structures)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/7fa8221053ec426486abdced1873e6e6)](https://www.codacy.com/manual/sm2774us/Data_Structures?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=sm2774us/Data_Structures&amp;utm_campaign=Badge_Grade)
+
+
 ## Complexity (Big O)
 
 Complexity of an algorithm measures time and memory. How long does one algorithm takes to finish? How much memory does it use?
